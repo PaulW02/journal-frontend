@@ -1,11 +1,86 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
 import DefaultLayout from '../../layout/DefaultLayout';
+import Keycloak from "keycloak-js";
+import jsonFile from "../../keycloak.json"
+
 
 const SignIn: React.FC = () => {
+
+
+  const [keycloak, setKeycloak] = useState<Keycloak.KeycloakInstance | null>(null);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const navigate = useNavigate();
+  const username = window.sessionStorage.getItem('username');
+
+  useEffect(() => {
+    const initKeycloak = async () => {
+      const keycloakInstance = new Keycloak({
+        url: "http://localhost:8181",
+        realm: "Journal",
+        clientId: "journal-frontend",
+      });
+      try {
+        await keycloakInstance.init({
+
+          // Add other Keycloak initialization options here
+        });
+        setKeycloak(keycloakInstance);
+        setAuthenticated(true);
+      } catch (error) {
+        console.error('Keycloak initialization error', error);
+      }
+    };
+
+    initKeycloak();
+  }, []);
+
+  const handleInputChange = (e: any) => {
+    const {name, value} = e.target;
+    setFormData({...formData, [name]: value});
+  };
+
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+
+    if (!keycloak) {
+      console.error('Keycloak not initialized');
+      return;
+    }
+    await keycloak.init({
+      checkLoginIframe: false, // or true depending on your use case
+      checkLoginIframeInterval: 0, // or adjust the interval
+      // ... other options
+    });
+
+    const loginOptions: Keycloak.KeycloakLoginOptions = {
+      loginHint: formData.username, // Use username as the login hint
+      // Add other relevant properties if needed
+    };
+    try {
+
+      await keycloak.login(loginOptions);
+
+      const userProfile = await keycloak.loadUserProfile();
+      if (userProfile != null) {
+        console.log(userProfile + " test");
+        window.sessionStorage.setItem('userId', userProfile.id != null ? userProfile.id : "");
+        window.sessionStorage.setItem('userId', userProfile.username != null ? userProfile.username : "TEST");
+        //localStorage.setItem('username', userProfile.email);
+        //localStorage.setItem('role', userProfile.role);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error('Login failed', error);
+      // Handle login failure (e.g., show an error message)
+    }
+  };
+
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Sign In" />
@@ -156,7 +231,7 @@ const SignIn: React.FC = () => {
                 Sign In to TailAdmin
               </h2>
 
-              <form>
+              <form onClick={handleLogin} method="POST">
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
@@ -165,6 +240,9 @@ const SignIn: React.FC = () => {
                     <input
                       type="email"
                       placeholder="Enter your email"
+                      value={formData.username} onChange={handleInputChange}
+                      name="username"
+                      id="username"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
 
@@ -196,6 +274,9 @@ const SignIn: React.FC = () => {
                     <input
                       type="password"
                       placeholder="6+ Characters, 1 Capital letter"
+                      value={formData.password} onChange={handleInputChange}
+                      name="password"
+                      id="password"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
 

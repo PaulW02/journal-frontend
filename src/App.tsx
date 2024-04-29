@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
+import PatientView from './pages/PatientView';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,6 +30,7 @@ function App() {
   }, []);
 
   return loading ? (
+
     <Loader />
   ) : (
     <>
@@ -105,6 +107,15 @@ function App() {
             </>
           }
         />
+      <Route
+          path="/patient/:id"
+          element={
+              <>
+                  <PageTitle title="Patient View | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+                  <PatientView />
+              </>
+          }
+      />
         <Route
           path="/ui/alerts"
           element={

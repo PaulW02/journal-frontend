@@ -4,6 +4,8 @@ import BrandTwo from '../../images/brand/brand-02.svg';
 import BrandThree from '../../images/brand/brand-03.svg';
 import BrandFour from '../../images/brand/brand-04.svg';
 import BrandFive from '../../images/brand/brand-05.svg';
+import {useNavigate} from 'react-router-dom'; // Import useHistory from react-router-dom
+import { userService } from "../../api/UserService"
 
 const brandData: BRAND[] = [
   {
@@ -50,16 +52,28 @@ const brandData: BRAND[] = [
 
 const TableOne = () => {
 
+  const navigate = useNavigate(); // Initialize useHistory
+
   const handleGetPatient = (id) => {
-    fetch(`http://localhost:8000/api/patient?patientId=${id}`)
-        .then(response => response.json())
+    fetch(`http://localhost:8000/api/patient/?patientId=${id}`, {
+      headers: {
+        'Authorization': `Bearer ${userService.getToken()}`
+      }
+    })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text(); // Return response as text
+        })
         .then(data => {
-          // Handle the fetched patient data, e.g., show it in a modal or redirect to another page
+          // Handle the fetched patient data
           console.log('Fetched patient:', data);
+          // Redirect to the patient view page
+          navigate(`/patient/${id}`); // Redirect to the patient view page with the patient ID
         })
         .catch(error => console.error('Error fetching patient:', error));
   };
-
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
