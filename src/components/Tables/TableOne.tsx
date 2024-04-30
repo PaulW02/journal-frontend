@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { patientService } from '../../api/PatientService'; // Replace with your API library
-import { userService } from '../../api/UserService'; // Replace with your API library
+import { userService } from '../../api/UserService';
+import {useNavigate} from "react-router-dom"; // Replace with your API library
 
 const TableOne = () => {
   const [patients, setPatients] = useState([]);
-
+  const navigate = useNavigate();
   // Fetch patients on component mount
   useEffect(() => {
     const fetchPatients = async () => {
@@ -25,6 +26,7 @@ const TableOne = () => {
           throw new Error('Failed to trigger read all patients event');
         }
         console.log('Read all patients event triggered successfully');
+        setPatients(response)
       } catch (error) {
         console.error('Error triggering read all patients event:');
       }
@@ -90,7 +92,7 @@ const TableOne = () => {
                   key={patient.id} // Use unique identifier for key
               >
                 <div className="p-2.5 xl:p-5">
-                  <p className="text-black dark:text-white">{patient.name}</p>
+                  <p className="text-black dark:text-white">{patient.firstName}</p>
                 </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
                   <button onClick={() => handleGetPatient(patient.id)}>
@@ -98,12 +100,11 @@ const TableOne = () => {
                   </button>
                 </div>
                 {/* Add more data columns if needed based on patient data */}
-                <button onClick={() => handleGetPatient(patient.id)}>
-                  View
-                </button>
+
               </div>
           ))}
         </div>
+
       </div>
   );
 };
