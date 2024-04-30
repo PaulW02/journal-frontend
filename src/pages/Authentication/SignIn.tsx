@@ -23,6 +23,7 @@ const SignIn: React.FC = () => {
         url: "http://localhost:8181",
         realm: "Journal",
         clientId: "journal-frontend",
+        clientSecret: ""
       });
       try {
         await keycloakInstance.init({
