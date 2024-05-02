@@ -61,7 +61,7 @@ const hasRole = (role) => {
 };
 
 const isDoctor = () => {
-    return hasRole("role_doctor");
+    return hasRole("ROLE_doctor");
 }
 
 const isEmployee = () => {

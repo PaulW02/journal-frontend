@@ -15,49 +15,14 @@ const TableOne = () => {
           throw new Error('Failed to trigger read all patients event');
         }
         console.log('Read all patients event triggered successfully');
+        setPatients(response)
       } catch (error) {
         console.error('Error triggering read all patients event test:');
       }
     };
-    const retrievePatients = async () => {
-      try {
-        const response = await patientService.retrieveAllPatients(); // Replace with your API endpoint
-        if (!response) {
-          throw new Error('Failed to trigger read all patients event');
-        }
-        console.log('Read all patients event triggered successfully');
-        setPatients(response)
-      } catch (error) {
-        console.error('Error triggering read all patients event:');
-      }
-    };
-
     fetchPatients();
-    retrievePatients();
   }, []);
 
-
-
-  const handleGetPatient = (id) => {
-    fetch(`http://localhost:8000/api/patient/?patientId=${id}`, {
-      headers: {
-        'Authorization': `Bearer ${userService.getToken()}`
-      }
-    })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.text(); // Return response as text
-        })
-        .then(data => {
-          // Handle the fetched patient data
-          console.log('Fetched patient:', data);
-          // Redirect to the patient view page
-          navigate(`/patient/${id}`); // Redirect to the patient view page with the patient ID
-        })
-        .catch(error => console.error('Error fetching patient:', error));
-  };
 
   return (
       <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -70,7 +35,17 @@ const TableOne = () => {
           <div className="grid grid-cols-2 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-4">
             <div className="p-2.5 xl:p-5">
               <h5 className="text-sm font-medium uppercase xsm:text-base">
-                Name
+                First name
+              </h5>
+            </div>
+            <div className="p-2.5 xl:p-5">
+              <h5 className="text-sm font-medium uppercase xsm:text-base">
+                Last name
+              </h5>
+            </div>
+            <div className="p-2.5 xl:p-5">
+              <h5 className="text-sm font-medium uppercase xsm:text-base">
+                Age
               </h5>
             </div>
             <div className="p-2.5 text-center xl:p-5">
@@ -94,8 +69,14 @@ const TableOne = () => {
                 <div className="p-2.5 xl:p-5">
                   <p className="text-black dark:text-white">{patient.firstName}</p>
                 </div>
+                <div className="p-2.5 xl:p-5">
+                  <p className="text-black dark:text-white">{patient.lastName}</p>
+                </div>
+                <div className="p-2.5 xl:p-5">
+                  <p className="text-black dark:text-white">{patient.age}</p>
+                </div>
                 <div className="flex items-center justify-center p-2.5 xl:p-5">
-                  <button onClick={() => handleGetPatient(patient.id)}>
+                  <button onClick={() => navigate(`/patient/${patient.id}`)}>
                     View
                   </button>
                 </div>

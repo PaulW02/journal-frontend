@@ -7,7 +7,7 @@ import SignIn from './pages/Authentication/SignIn';
 import SignUp from './pages/Authentication/SignUp';
 import Calendar from './pages/Calendar';
 import Chart from './pages/Chart';
-import ECommerce from './pages/Dashboard/ECommerce';
+import Dashboard from './pages/Dashboard/Dashboard.tsx';
 import FormElements from './pages/Form/FormElements';
 import FormLayout from './pages/Form/FormLayout';
 import Profile from './pages/Profile';
@@ -16,6 +16,8 @@ import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
 import PatientView from './pages/PatientView';
+import CreatePatient from "./pages/CreatePatient.tsx";
+import Login from "./pages/Authentication/Login.tsx";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -39,8 +41,8 @@ function App() {
           index
           element={
             <>
-              <PageTitle title="eCommerce Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <ECommerce />
+              <PageTitle title="Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <Dashboard />
             </>
           }
         />
@@ -107,15 +109,25 @@ function App() {
             </>
           }
         />
-      <Route
+        <Route
           path="/patient/:id"
-          element={
+            element={
               <>
-                  <PageTitle title="Patient View | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-                  <PatientView />
+                <PageTitle title="Patient View | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+                <PatientView />
               </>
-          }
-      />
+              }
+        />
+
+          <Route
+              path="/patient/create"
+              element={
+                  <>
+                      <PageTitle title="Patient View | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+                      <CreatePatient />
+                  </>
+              }
+          />
         <Route
           path="/ui/alerts"
           element={
@@ -143,6 +155,15 @@ function App() {
             </>
           }
         />
+          <Route
+              path="/auth/login"
+              element={
+                  <>
+                      <PageTitle title="Login | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+                      <Login />
+                  </>
+              }
+          />
         <Route
           path="/auth/signup"
           element={

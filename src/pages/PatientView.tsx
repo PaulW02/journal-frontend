@@ -12,14 +12,13 @@ const PatientView = () => {
     }
 
     const patientId = getPatientIdFromUrl();
-    console.log("Patient ID:", patientId);
-    const navigate = useNavigate(); // To handle potential navigation
+    const navigate = useNavigate();
 
     const [patientData, setPatientData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isPolling, setIsPolling] = useState(true); // Start polling initially
-// ... other state and logic
+
     useEffect(() => {
         const fetchPatientData = async () => {
             setIsLoading(true);
@@ -27,7 +26,6 @@ const PatientView = () => {
 
             try {
                 const response = await patientService.getPatientDetails(patientId);
-                console.log(response.firstName + " TEEAES");
                 setPatientData(response);
             } catch (error) {
                 console.error('Error fetching patient data:', error);
@@ -37,14 +35,13 @@ const PatientView = () => {
             }
         };
 
-        // Only fetch data if polling is active and data is not yet available
         if (isPolling && !patientData) {
             fetchPatientData();
         }
 
-        // Cleanup function to stop polling on unmount
-    }, [patientData, isPolling]); // Re-run when relevant values change
-    // Handle potential errors or navigation
+        return () => setIsPolling(false); // Cleanup function to stop polling on unmount
+    }, [patientData, isPolling, patientId]); // Re-run when relevant values change
+
     if (error) {
         return (
             <div>
@@ -57,13 +54,36 @@ const PatientView = () => {
     if (isLoading) {
         return <div>Loading patient data...</div>;
     }
+    console.log(patientData);
+    const { firstName, lastName, conditions, observations } = patientData;
+
     return (
         <DefaultLayout>
-        <div>
-            {/* Display patient details using patientData */}
-            <p>Patient Name: {patientData.firstName}</p>
-            {/* ... other patient details ... */}
-        </div>
+            <div className="patient-view">
+                <h2>Patient Profile</h2>
+                <div className="patient-info">
+                    <p>
+                        <b>Name:</b> {firstName} {lastName}
+                    </p>
+                </div>
+                <div className="patient-health">
+                    <h3>Medical Conditions</h3>
+                    <ul>
+                        {conditions.map((condition) => (
+                            <li key={condition.id}>{condition.name}</li>
+                        ))}
+                    </ul>
+                    <h3>Observations</h3>
+                    <ul>
+                        {observations.map((observation) => (
+                            <li key={observation.id}>{observation.name} ({observation.dosage})</li>
+                        ))}
+                    </ul>
+                </div>
+                {/* Add creative elements here (optional) */}
+                {/* Example: Timeline visualization for conditions and medications */}
+                {/* You can use libraries like 'react-timeseries-charts' */}
+            </div>
         </DefaultLayout>
     );
 };

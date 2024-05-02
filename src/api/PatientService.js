@@ -1,7 +1,8 @@
 import Keycloak from "keycloak-js";
 import {userService} from "./UserService.js";
 
-const serverUrl = "http://localhost:8000";
+const serverReadUrl = "http://localhost:8000";
+const serverWriteUrl = "http://localhost:8001";
 
 const _kc = new Keycloak({
     realm: "Journal",
@@ -22,7 +23,7 @@ const getPatientDetails = async (patientId) => {
         throw new Error("Missing access token for API call");
     }
 
-    const url = `${serverUrl}/api/patient/retrieve/${patientId}`;
+    const url = `${serverReadUrl}/api/patient/retrieve/${patientId}`;
     const response = await fetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -44,7 +45,7 @@ const getAllPatients = async () => {
         throw new Error("Missing access token for API call");
     }
 
-    const url = `${serverUrl}/api/patient/all`;
+    const url = `${serverReadUrl}/api/patient/all`;
     const response = await fetch(url, {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -58,22 +59,26 @@ const getAllPatients = async () => {
     const data = await response.json();
     return data;
 };
-const retrieveAllPatients = async () => {
+
+const createPatient = async (newPatientData) => {
     const token = userService.getToken();
 
     if (!token) {
         throw new Error("Missing access token for API call");
     }
 
-    const url = `${serverUrl}/api/patient/retrieve/all`;
+    const url = `${serverWriteUrl}/api/patient/`;
     const response = await fetch(url, {
+        method: 'POST', // Specify POST method for creating
         headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json' // Set content type for JSON data
         },
+        body: JSON.stringify(newPatientData) // Send newPatientData as JSON
     });
 
     if (!response.ok) {
-        throw new Error(`Error fetching patients: ${response.statusText}`);
+        throw new Error(`Error creating patient: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -82,6 +87,6 @@ const retrieveAllPatients = async () => {
 
 export const patientService = {
     getPatientDetails,
-    retrieveAllPatients,
-    getAllPatients
+    getAllPatients,
+    createPatient
 }
