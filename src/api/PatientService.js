@@ -85,8 +85,41 @@ const createPatient = async (newPatientData) => {
     return data;
 };
 
+const addCondition = async (condition, patientId) => {
+
+    const token = userService.getToken();
+
+    if (!token) {
+        throw new Error("Missing access token for API call");
+    }
+    const url = `${serverWriteUrl}/api/condition/`;
+
+
+    const bodyData = {
+        condition: condition,
+        patientId: patientId
+    };
+
+    const response = await fetch(url, {
+        method: 'POST', // Specify POST method for creating
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json' // Set content type for JSON data
+        },
+        body: JSON.stringify(bodyData) // Send bodyData as JSON
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error creating patient: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+};
+
 export const patientService = {
     getPatientDetails,
     getAllPatients,
-    createPatient
+    createPatient,
+    addCondition
 }

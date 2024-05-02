@@ -18,6 +18,7 @@ const PatientView = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isPolling, setIsPolling] = useState(true); // Start polling initially
+    const [newCondition, setNewCondition] = useState('');
 
     useEffect(() => {
         const fetchPatientData = async () => {
@@ -42,6 +43,17 @@ const PatientView = () => {
         return () => setIsPolling(false); // Cleanup function to stop polling on unmount
     }, [patientData, isPolling, patientId]); // Re-run when relevant values change
 
+    const handleAddCondition = async () => {
+        try {
+            // Assuming '/api/condition/' endpoint accepts POST request with patientId and condition name
+            await patientService.addCondition(newCondition, patientId);
+            // Refetch patient data to update conditions list
+        } catch (error) {
+            console.error('Error adding condition:', error);
+            // Handle error appropriately, e.g., show error message to the user
+        }
+    };
+
     if (error) {
         return (
             <div>
@@ -54,7 +66,7 @@ const PatientView = () => {
     if (isLoading) {
         return <div>Loading patient data...</div>;
     }
-    console.log(patientData);
+
     const { firstName, lastName, conditions, observations } = patientData;
 
     return (
@@ -70,7 +82,7 @@ const PatientView = () => {
                     <h3>Medical Conditions</h3>
                     <ul>
                         {conditions.map((condition) => (
-                            <li key={condition.id}>{condition.name}</li>
+                            <li key={condition.id}>{condition.conditionName}</li>
                         ))}
                     </ul>
                     <h3>Observations</h3>
@@ -80,7 +92,20 @@ const PatientView = () => {
                         ))}
                     </ul>
                 </div>
-                {/* Add creative elements here (optional) */}
+                {/* Add input field and button to add condition */}
+                <div>
+                    <br/>
+                    <input
+                        type="text"
+                        value={newCondition}
+                        onChange={(e) => setNewCondition(e.target.value)}
+                        className="rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        placeholder="Enter new condition"
+                    />
+                    <br/>
+                    <br/>
+                    <button className="cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90" onClick={handleAddCondition}>Add Condition</button>
+                </div>
                 {/* Example: Timeline visualization for conditions and medications */}
                 {/* You can use libraries like 'react-timeseries-charts' */}
             </div>
