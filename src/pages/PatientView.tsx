@@ -19,6 +19,8 @@ const PatientView = () => {
     const [error, setError] = useState(null);
     const [isPolling, setIsPolling] = useState(true); // Start polling initially
     const [newCondition, setNewCondition] = useState('');
+    const [newObservationType, setNewObservationType] = useState('');
+    const [newObservationValue, setNewObservationValue] = useState(0);
 
     useEffect(() => {
         const fetchPatientData = async () => {
@@ -54,6 +56,17 @@ const PatientView = () => {
         }
     };
 
+    const handleAddEncounterObservation = async () => {
+        try {
+            // Assuming '/api/condition/' endpoint accepts POST request with patientId and condition name
+            await patientService.addEncounterObservation(patientId, newObservationType, newObservationValue);
+            // Refetch patient data to update conditions list
+        } catch (error) {
+            console.error('Error adding condition:', error);
+            // Handle error appropriately, e.g., show error message to the user
+        }
+    };
+
     if (error) {
         return (
             <div>
@@ -67,7 +80,7 @@ const PatientView = () => {
         return <div>Loading patient data...</div>;
     }
 
-    const { firstName, lastName, conditions, observations } = patientData;
+    const { firstName, lastName, conditions, observations, encounters } = patientData;
 
     return (
         <DefaultLayout>
@@ -85,10 +98,16 @@ const PatientView = () => {
                             <li key={condition.id}>{condition.conditionName}</li>
                         ))}
                     </ul>
-                    <h3>Observations</h3>
+                    {/*<h3>Observations</h3>
                     <ul>
-                        {observations.map((observation) => (
-                            <li key={observation.id}>{observation.name} ({observation.dosage})</li>
+                        observations.map( => (
+                            <li key=observation.id>observation.typ (observation.value)</li>
+                        ))}
+                    </ul>*/}
+                    <h3>Encounters</h3>
+                    <ul>
+                        {encounters.map((encounter) => (
+                            <li key={encounter.id}>{encounter.visitDate} ({encounter.observationDTO.type}: {encounter.observationDTO.value})</li>
                         ))}
                     </ul>
                 </div>
@@ -106,8 +125,30 @@ const PatientView = () => {
                     <br/>
                     <button className="cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90" onClick={handleAddCondition}>Add Condition</button>
                 </div>
-                {/* Example: Timeline visualization for conditions and medications */}
-                {/* You can use libraries like 'react-timeseries-charts' */}
+
+                <div>
+                    <br/>
+                    <input
+                        type="text"
+                        value={newObservationType}
+                        onChange={(e) => setNewObservationType(e.target.value)}
+                        className="rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        placeholder="Enter observation type"
+                    />
+                    <br/>
+                    <br/>
+                    <input
+                        type="text"
+                        value={newObservationValue}
+                        onChange={(e) => setNewObservationValue(e.target.value)}
+                        className="rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        placeholder="Enter observation value"
+                    />
+                    <br/>
+                    <br/>
+                    <button className="cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90" onClick={handleAddEncounterObservation}>Add Observation</button>
+                </div>
+
             </div>
         </DefaultLayout>
     );

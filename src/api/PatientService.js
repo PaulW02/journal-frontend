@@ -109,17 +109,55 @@ const addCondition = async (condition, patientId) => {
         body: JSON.stringify(bodyData) // Send bodyData as JSON
     });
 
+    if (!response || !response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(`Error creating condition: ${errorMessage}`);
+    }
+
+    // No need to parse JSON, handle the text response directly
+    const message = await response.text();
+    console.log("Condition creation message:", message);
+    // Handle the message (e.g., display a success message)
+    return message;
+};
+const addEncounterObservation = async (patientId, observationType, observationValue) => {
+
+    const token = userService.getToken();
+
+    if (!token) {
+        throw new Error("Missing access token for API call");
+    }
+    const url = `${serverWriteUrl}/api/encounter/`;
+
+
+    const bodyData = {
+        patientId: patientId,
+        observationType: observationType,
+        observationValue: observationValue
+    };
+
+    const response = await fetch(url, {
+        method: 'POST', // Specify POST method for creating
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json' // Set content type for JSON data
+        },
+        body: JSON.stringify(bodyData) // Send bodyData as JSON
+    });
+
     if (!response.ok) {
-        throw new Error(`Error creating patient: ${response.statusText}`);
+        throw new Error(`Error creating encounter and observation: ${response.statusText}`);
     }
 
     const data = await response.json();
     return data;
 };
 
+
 export const patientService = {
     getPatientDetails,
     getAllPatients,
     createPatient,
-    addCondition
+    addCondition,
+    addEncounterObservation
 }
